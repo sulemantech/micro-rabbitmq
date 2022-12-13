@@ -1,44 +1,53 @@
 const experess = require("express");
+const mongoose = require("mongoose");
+const sequelize = require("sequelize");
+
+const amqp = require("amqplib");
 const { Sequelize } = require("sequelize");
-const sequalize = require("sequelize");
+
 const app = experess();
 
-const startUp = async ()=>{
 
-    const sequalize = new Sequelize(process.env.PG_URI);
-    sequalize.authenticate().then(conn=>{
-        console.log("Consumer connected to Postgres");
-    })
-    
-    const queue = 'tasks';
-    const conn = await amqplib.connect('amqp://localhost');
-
-    const ch1 = await conn.createChannel();
-    await ch1.assertQueue(queue);
-
-    // Listener
-    ch1.consume(queue, (msg) => {
-        if (msg !== null) {
-        console.log('Received:', msg.content.toString());
-        ch1.ack(msg);
-        } else {
-        console.log('Consumer cancelled by server');
-        }
-    });
-
-    // Sender
-    const ch2 = await conn.createChannel();
-
-    setInterval(() => {
-        ch2.sendToQueue(queue, Buffer.from('something to do'));
-    }, 1000);
+const PORT = process.env.PORT || 4003;
+function  startUp () {
+    /*const sequelize = new Sequelize(process.env.PG_URL, sequelize.authenticate()
+    .then(conn=>{
+        console.log('Consumer: Connected to Postgres');
+    }).catch(() => {
+        console.error("Caught an error");
+      })*/
 }
-setTimeout(startUp,30000);
+var channel, conn;
 
-app.get("/",()=>{
-    res.json({
-        message:"Aoa World";
-    })
-});
+async function sendToQueue(data){
+    try {
+        const connection = await amqp.connect("amqp://localhost:5672");
+        const channel = await connection.createChannel();
+        console.log('Start publishing');
+        return await channel.sendToQueue("test-queue", Buffer.from(JSON.stringify(data)));
+        console.log('End publishing');
 
-app.listen(process.env.EXPRESS_PORT);
+        await channel.close();
+        await connection.close();
+    }
+    catch (ex) {
+        console.error(ex);
+    }
+}
+
+app.get("/send-msg", (req, res) => {
+    
+    // data to be sent
+    const data = {
+        productId  : 1,
+        Name : "IPhone",
+        Price: 200,
+        Model:2022
+    }
+    //connectQueue();
+    sendToQueue(data);  // pass the data to the function we defined
+    console.log("A message is sent to queue")
+    res.send("Message Sent"); //response to the API request
+    
+})
+app.listen(PORT, ()=>console.log("Server running at port: "+ PORT));
