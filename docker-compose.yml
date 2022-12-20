@@ -32,7 +32,11 @@ services:
     build: ./consumer
     ports:
       - '80:80'
+  producer:
+    build: ./producer
+    ports:
+      - '80:80'
     environment:
       - MONGO_URI=mongodb://mongo_db:27107/test
       - EXPRESS_PORT=80
-      - RABBIT_URI=
+      - RABBIT_URI=amqp://admin:admin@micro_rabbit:rabbithost

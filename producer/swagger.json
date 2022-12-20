@@ -1,0 +1,206 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0", 
+      "title": "Microservices, IOT & RabbitMq",
+      "description": "Microservices with RabbitMq Integration & IoTs",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "host": "localhost:4003",
+    "basePath": "/",
+    "tags": [
+      {
+        "name": "Messaging",
+        "description": "API for messaging in the IoT system"
+      }
+    ],
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+        "/addDevice": {
+          "post": {
+            "tags": [
+              "Devices"
+            ],
+            "description": "Create new device in system",
+            "parameters": [
+              {
+                "name": "device",
+                "in": "body",
+                "description": "Device that we want to create",
+                "schema": {
+                  "$ref": "#/definitions/Device"
+                }
+              }
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "responses": {
+              "200": {
+                "description": "New device is created",
+                "schema": {
+                  "$ref": "#/definitions/Device"
+                }
+              }
+            }
+          } 
+        },
+        "/devices": {
+          "get": {
+              "tags": [
+                "Devices"
+              ],
+              "summary": "Get all devices in system",
+              "responses": {
+                "200": {
+                  "description": "OK",
+                  "schema": {
+                    "$ref": "#/definitions/Devices"
+                  }
+                }
+              }
+            }
+        },
+        "/device/{id}": {
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "ID of device that we want to find",
+              "type": "integer"
+            }
+          ],
+          "delete": {
+            "summary": "Delete device with given ID",
+            "tags": [
+              "Devices"
+            ],
+            "responses": {
+              "200": {
+                "description": "Device is deleted",
+                "schema": {
+                  "$ref": "#/definitions/Device"
+                }
+              }
+            }
+          },
+          "put": {
+            "summary": "Update device with give ID",
+            "tags": [
+              "Devices"
+            ],
+            "parameters": [
+              {
+                "name": "device",
+                "in": "body",
+                "description": "Device with new values of properties",
+                "schema": {
+                  "$ref": "#/definitions/updateDevice"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Device is updated",
+                "schema": {
+                  "$ref": "#/definitions/Device"
+                }
+              }
+            }
+          }
+        }
+      },
+      "definitions": {
+        "Device": {
+          "required": [
+            "name",
+            "_id",
+            "companies"
+          ],
+          "properties": {
+            "_id": {
+              "type": "integer",
+              "uniqueItems": true
+            },
+            "isPublic": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "string"
+            },
+            "books": {
+              "type": "array",
+              "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  }
+              }
+                  
+            },
+            "companies": {
+              "type": "array",
+              "items": {
+                  "type": "string"      
+              }
+                  
+            }
+           
+          }
+        },
+        "updateDevice": {
+          "required": [
+            "name",
+            "companies"
+          ],
+          "properties": {
+            "isPublic": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "string"
+            },
+            "books": {
+              "type": "array",
+              "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  }
+              }
+                  
+            },
+            "companies": {
+              "type": "array",
+              "items": {
+                  "type": "string"      
+              }
+                  
+            }
+           
+          }
+        },
+        "Devices": {
+          "type": "array",
+          "$ref": "#/definitions/Device"
+        }
+    }
+}
+
+  
